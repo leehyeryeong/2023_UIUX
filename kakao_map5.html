@@ -2,33 +2,34 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>클릭 이벤트 등록하기</title>
+  <title>타일로드 이벤트 등록하기</title>
 </head>
 <body>
-  <div id="map" style="width:100%;height:350px;"></div>
-  <p><em>지도를 클릭해주세요!</em></p> 
-  <p id="result"></p>
-
-  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=36768afcecb541e66ecb9888ec7fc274"></script>
-  <script>
-    var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+<div id="map" style="width:100%;height:350px;"></div>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=36768afcecb541e66ecb9888ec7fc274"></script>
+<script>
+  var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
     mapOption = { 
       center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표
       level: 3 // 지도의 확대 레벨
     };
 
-    var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+  var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
 
-    // 지도에 클릭 이벤트를 등록합니다
-    // 지도를 클릭하면 마지막 파라미터로 넘어온 함수를 호출합니다
-    kakao.maps.event.addListener(map, 'click', function(mouseEvent) {        
-      // 클릭한 위도, 경도 정보를 가져옵니다 
-      var latlng = mouseEvent.latLng;
-      var message = '클릭한 위치의 위도는 ' + latlng.getLat() + ' 이고, ';
-      message += '경도는 ' + latlng.getLng() + ' 입니다';
-      var resultDiv = document.getElementById('result'); 
-      resultDiv.innerHTML = message;
-    });
-  </script>
+  var marker = new kakao.maps.Marker();
+
+  // 타일 로드가 완료되면 지도 중심에 마커를 표시합니다
+  kakao.maps.event.addListener(map, 'tilesloaded', displayMarker);
+
+  function displayMarker() {
+    // 마커의 위치를 지도중심으로 설정합니다 
+    marker.setPosition(map.getCenter()); 
+    marker.setMap(map); 
+    
+    // 아래 코드는 최초 한번만 타일로드 이벤트가 발생했을 때 어떤 처리를 하고 
+    // 지도에 등록된 타일로드 이벤트를 제거하는 코드입니다 
+    // kakao.maps.event.removeListener(map, 'tilesloaded', displayMarker);
+  }
+</script>
 </body>
 </html>

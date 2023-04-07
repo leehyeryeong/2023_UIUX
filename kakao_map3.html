@@ -2,67 +2,54 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>지도 이동 막기</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <title>이동 이벤트 등록하기</title>
 </head>
 <body>
-    <div id="map" style="width:100%;height:350px;"></div>
-    <p>
-        <button type="button" class="btn btn-outline-primary" onclick="setDraggable(false)">지도 드래그 이동 끄기</button>
-        <button type="button" class="btn btn-outline-primary" onclick="setDraggable(true)">지도 드래그 이동 켜기</button>
-    </p>
-    <p>
-      <button type="button" class="btn btn-success" onclick="setOverlayMapTypeId('traffic')">교통정보 보기</button> 
-      <button type="button" class="btn btn-success" onclick="setOverlayMapTypeId('roadview')">로드뷰 도로정보 보기</button> 
-      <button type="button" class="btn btn-success" onclick="setOverlayMapTypeId('terrain')">지형정보 보기</button>
-      <button type="button" class="btn btn-success" onclick="setOverlayMapTypeId('use_district')">지적편집도 보기</button>
-    </p> 
+<div id="map" style="width:100%;height:350px;"></div>
+<p><em>지도를 움직여 주세요!</em></p> 
+<p id="result"></p>
 
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=916a9baf54493d22aaf82545a44f6168"></script>
-    <script>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=36768afcecb541e66ecb9888ec7fc274"></script>
+<script>
     var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
         mapOption = { 
             center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표
-             // draggable: false, // 지도를 생성할때 지도 이동 및 확대/축소를 막으려면 draggable: false 옵션을 추가하세요
             level: 3 // 지도의 확대 레벨
         };
 
     var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
 
-    // 버튼 클릭에 따라 지도 이동 기능을 막거나 풀고 싶은 경우에는 map.setDraggable 함수를 사용합니다
-    function setDraggable(draggable) {
-        // 마우스 드래그로 지도 이동 가능여부를 설정합니다
-        map.setDraggable(draggable);    
-    }
-    // 지도에 추가된 지도타입정보를 가지고 있을 변수입니다
-    var currentTypeId;
+    // 마우스 드래그로 지도 이동이 완료되었을 때 마지막 파라미터로 넘어온 함수를 호출하도록 이벤트를 등록합니다
+    kakao.maps.event.addListener(map, 'dragend', function() {        
 
-    // 버튼이 클릭되면 호출되는 함수입니다
-    function setOverlayMapTypeId(maptype) {
-        var changeMaptype;
+        // 지도 중심좌표를 얻어옵니다 
+        var latlng = map.getCenter(); 
 
-        // maptype에 따라 지도에 추가할 지도타입을 결정합니다
-        if (maptype === 'traffic') {            
-            // 교통정보 지도타입
-            changeMaptype = kakao.maps.MapTypeId.TRAFFIC;     
-        } else if (maptype === 'roadview') {        
-            // 로드뷰 도로정보 지도타입
-            changeMaptype = kakao.maps.MapTypeId.ROADVIEW;
-        } else if (maptype === 'terrain') {
-            // 지형정보 지도타입
-            changeMaptype = kakao.maps.MapTypeId.TERRAIN;
-        } else if (maptype === 'use_district') {
-            // 지적편집도 지도타입
-            changeMaptype = kakao.maps.MapTypeId.USE_DISTRICT;           
-        }
-        // 이미 등록된 지도 타입이 있으면 제거합니다
-        if (currentTypeId) {
-            map.removeOverlayMapTypeId(currentTypeId);    
-        }
+        var message = '변경된 지도 중심좌표는 ' + latlng.getLat() + ' 이고, ';
+        message += '경도는 ' + latlng.getLng() + ' 입니다';
 
-        // maptype에 해당하는 지도타입을 지도에 추가합니다
-        map.addOverlayMapTypeId(changeMaptype);
-      }
-    </script>
+        var resultDiv = document.getElementById('result');  
+        resultDiv.innerHTML = message;
+
+    });
+
+    // 지도에 클릭 이벤트를 등록합니다
+    // 지도를 클릭하면 마지막 파라미터로 넘어온 함수를 호출합니다
+    kakao.maps.event.addListener(map, 'click', function(mouseEvent) {        
+    
+        // 클릭한 위도, 경도 정보를 가져옵니다 
+        var latlng = mouseEvent.latLng;
+        
+        var message = '클릭한 위치의 위도는 ' + latlng.getLat() + ' 이고, ';
+        message += '경도는 ' + latlng.getLng() + ' 입니다';
+        
+        var resultDiv = document.getElementById('result-click'); 
+        resultDiv.innerHTML = message;
+  
+    });
+
+    // getLat() : 위도
+    // getLng() : 경도
+</script>
 </body>
 </html>
